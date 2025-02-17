@@ -1,0 +1,24 @@
+{
+    "name": "keysight_localws",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "dev": "vite"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "get-port": "^7.1.0",
+        "open": "^10.1.0",
+        "socket.io": "^2.3.0",
+        "tmi.js": "^1.8.5"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3",
+        "socket.io-client": "^2.3.0"
+    }
+}
