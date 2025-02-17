@@ -163,9 +163,10 @@ function authenticateUser() {
         });
         if (browser === "manual") {
             //Let the user manually copy the redirect URL in case they are using non-standard browser
-            DebugLog.line(oauthUrl.length);
-            console.log(oauthUrl);
-            DebugLog.line(oauthUrl.length);
+            // DebugLog.line(process.stdout.columns);
+            console.log(`${DebugLog.RED}${"ˍ".repeat(process.stdout.columns)}${DebugLog.WHITE}`);
+            console.log(`${DebugLog.BLUE}${oauthUrl}${DebugLog.WHITE}`);
+            console.log(`${DebugLog.RED}${"¯".repeat(process.stdout.columns)}${DebugLog.WHITE}`);
         } else {
             //Finally open an external browser window to show the auth page
             const open = ((await import("open")).default);

@@ -21,7 +21,7 @@ if (ARGS.help) {
       --channel         Twitch channel to join (Defaults to signed in user)
       --commandsFile    Path to commands.json file (Default './commands.json')
       --tokenFile       Path to token.json file (Default './token.json')
-      --login           Ignores the token.json file and forces relogin
+      --login           Ignores the token.json file and forces re-login
     `);
     process.exit(0);  // Stop the program after showing help
 }
@@ -55,7 +55,7 @@ if (ARGS.help) {
         }
         ws.sendMessageToKeysight(command, chatUser, chatCommand)
             .then((response) => {
-                chatCommand.response = response;
+                chatCommand.response = (typeof response === 'object' && "reply" in response) ? response.reply : response;
                 command.hasSuccessReply() && callback(command.getSuccessReply(chatUser, chatCommand));
             })
             .catch((error) => {

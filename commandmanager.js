@@ -71,7 +71,11 @@ class Command {
         return this._insufficient_arguments_reply && this._replaceWildcards(this._insufficient_arguments_reply, chatUser, chatCommand);
     }
     _replaceWildcards(text, chatUser, chatCommand) {
-        return text.replaceAll("$cmd", this.commandName).replaceAll("$msg", chatCommand.msg).replaceAll("$usr", `@${chatUser.displayName}`).replaceAll("$res", chatCommand.response);
+        return text.replaceAll("$cmd", this.commandName)
+            .replaceAll("$msg", chatCommand.msg)
+            .replaceAll("$usr", `@${chatUser.displayName}`)
+            .replaceAll(`@@${chatUser.displayName}`, `@${chatUser.displayName}`)
+            .replaceAll("$res", chatCommand.response);
     }
 
     checkUserPermissions(chatUser) {
