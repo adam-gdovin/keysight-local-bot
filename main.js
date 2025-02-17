@@ -2,7 +2,7 @@ require("dotenv").config();
 const { getValidAccessTokenData } = require("./auth");
 const { ChatBot } = require("./bot");
 const { WebSocket } = require("./ws");
-const { CommandManager } = require("./commands");
+const { CommandManager } = require("./commandmanager");
 
 //Initialize the electron app
 !(async () => {
