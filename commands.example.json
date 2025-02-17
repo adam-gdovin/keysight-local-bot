@@ -1,19 +1,19 @@
 {
-    "Reflection": {
+    "Seed": {
         "triggers": [
-            "!reflection",
-            "!shiny",
-            "!silver"
+            "!seed"
         ],
         "permissions": {
-            "vip": true,
+            "everyone": false,
             "tier1": false,
             "tier2": true,
             "tier3": true,
+            "vip": true,
             "mod": true
         },
-        "message": "reflection",
-        "success_reply": "Switched to preset: $cmd",
-        "failure_reply": "You are not a Tier 2 or Tier 3 subscriber and cannot use this command."
+        "message": "seed:$msg",
+        "success_reply": "Switched to seed: $msg",
+        "failure_reply": "You are not a Tier 2 or Tier 3 subscriber and cannot use this command.",
+        "insufficient_arguments_reply": "Usage: !seed new seed"
     }
 }

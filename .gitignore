@@ -142,5 +142,7 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
-tokens.json
+token.json
 commands.json
+*.exe
+dist/

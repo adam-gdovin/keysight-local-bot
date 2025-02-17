@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keysight Commands Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #FFF;
+            margin: 20px;
+            text-align: center;
+        }
+        .command-name{
+            width: 100%;
+            margin-left: 0;
+        }
+        .command {
+            background: #34193C;
+            padding: 10px;
+            margin-bottom: 10px;
+            display:flex;
+            flex-flow: row nowrap;
+            position: relative;
+            gap: 20px;
+            justify-content: center;
+        }
+        .command > div {
+            display:flex;
+            flex-flow: column nowrap;
+        }
+        .command > div > div {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .remove-button{
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+        input[type="text"], button {
+            background: #532A62;
+            border: none;
+            color: #FFF;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+        }
+        span{
+            padding: 8px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        button {
+            cursor: pointer;
+            background: #26267C;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #4B4BDD;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Keysight Commands Editor</h2>
+    <input type="file" id="fileInput" accept=".json">
+    <button onclick="saveJSON()">Save JSON</button>
+    <button onclick="addCommand()">Add Command</button>
+    <div id="commandsContainer"></div>
+    <a id="downloadLink" style="display:none"></a>
+
+    <script>
+        let commands = {};
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    commands = JSON.parse(e.target.result);
+                    renderCommands();
+                } catch (error) {
+                    alert('Invalid JSON file');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function renderCommands() {
+            const container = document.getElementById('commandsContainer');
+            container.innerHTML = '';
+            Object.keys(commands).forEach(commandName => {
+                createCommandForm(commandName, commands[commandName]);
+            });
+        }
+
+        function createCommandForm(name, data) {
+            const container = document.getElementById('commandsContainer');
+            const div = document.createElement('div');
+            div.className = 'command';
+            div.innerHTML = `
+                <div class="inputs">
+                    <div>
+                        <input class="command-name" type="text" value="${name}" onchange="updateCommandName('${name}', this.value)">
+                    </div>
+                    <div>
+                        <span>Triggers:</span> <input type="text" value="${data.triggers.join(', ')}" onchange="updateTriggers('${name}', this.value)">
+                    </div>
+                    <div>
+                        <span>Message:</span> <input type="text" value="${data.message}" onchange="updateField('${name}', 'message', this.value)">
+                    </div>
+                    <div>
+                        <span>Success Reply:</span> <input type="text" value="${data.success_reply}" onchange="updateField('${name}', 'success_reply', this.value)">
+                    </div>
+                    <div>
+                        <span>Failure Reply:</span> <input type="text" value="${data.failure_reply}" onchange="updateField('${name}', 'failure_reply', this.value)">
+                    </div>
+                    <div>
+                        <span>Insufficient Args Reply:</span> <input type="text" value="${data.insufficient_arguments_reply}" onchange="updateField('${name}', 'insufficient_arguments_reply', this.value)">
+                    </div>
+                </div>
+                <div class="permissions">
+                    ${Object.keys(data.permissions).map(role => `<div><span>${role.toUpperCase()}:</span> <input type="checkbox" ${data.permissions[role] ? 'checked' : ''} onchange="updatePermission('${name}', '${role}', this.checked)"></div>`).join(' ')}
+                </div>
+                <button class="remove-button" onclick="removeCommand('${name}')">Remove</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function updateCommandName(oldName, newName) {
+            if (oldName !== newName) {
+                commands[newName] = commands[oldName];
+                delete commands[oldName];
+                renderCommands();
+            }
+        }
+
+        function updateTriggers(command, value) {
+            commands[command].triggers = value.split(',').map(t => t.trim());
+        }
+
+        function updateField(command, field, value) {
+            commands[command][field] = value;
+        }
+
+        function updatePermission(command, role, value) {
+            commands[command].permissions[role] = value;
+        }
+
+        function addCommand() {
+            const newCommand = `new_command_${Object.keys(commands).length}`;
+            commands[newCommand] = {
+                triggers: [],
+                permissions: { everyone: false, tier1: false, tier2: false, tier3: false, vip: false, mod: false },
+                message: '',
+                success_reply: '',
+                failure_reply: '',
+                insufficient_arguments_reply: ''
+            };
+            renderCommands();
+        }
+
+        function removeCommand(name) {
+            delete commands[name];
+            renderCommands();
+        }
+
+        function saveJSON() {
+            const blob = new Blob([JSON.stringify(commands, null, 4)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.getElementById('downloadLink');
+            a.href = url;
+            a.download = 'commands.json';
+            a.style.display = 'block';
+            a.click();
+            a.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

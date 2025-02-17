@@ -3,22 +3,28 @@
     "version": "1.0.0",
     "description": "",
     "main": "main.js",
+    "bin": "main.js",
     "scripts": {
-        "dev": "vite"
+        "start": "node main.js",
+        "client": "node test_client.js",
+        "build": "pkg main.js --targets node18-win-x64,node18-macos-x64 --output dist/keysight_bot"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@inquirer/prompts": "^7.3.2",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
-        "get-port": "^7.1.0",
+        "minimist": "^1.2.8",
         "open": "^10.1.0",
+        "portfinder": "^1.0.32",
         "socket.io": "^2.3.0",
         "tmi.js": "^1.8.5"
     },
     "devDependencies": {
         "cross-env": "^7.0.3",
+        "pkg": "^5.8.1",
         "socket.io-client": "^2.3.0"
     }
 }
