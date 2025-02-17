@@ -13,7 +13,7 @@
         },
         "message": "seed:$msg",
         "success_reply": "Switched to seed: $msg",
-        "failure_reply": "You are not a Tier 2 or Tier 3 subscriber and cannot use this command.",
+        "insufficient_permissions_reply": "You are not a Tier 2 or Tier 3 subscriber and cannot use this command.",
         "insufficient_arguments_reply": "Usage: !seed new seed"
     }
 }

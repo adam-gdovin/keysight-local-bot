@@ -1,10 +1,7 @@
-// import { EventEmitter } from "events";
-// import fs from "fs";
-// import minimist from "minimist";
-
 const { EventEmitter } = require("events");
 const fs = require("fs");
 const minimist = require("minimist");
+const DebugLog = require("./debug-log");
 
 const ARGS = minimist(process.argv.slice(2));
 const COMMANDS_FILE = ARGS.commandsFile || process.env.COMMAND_FILE || "commands.json"; // File to store the commands
@@ -49,14 +46,14 @@ class Command {
         this.triggers = commandData.triggers.map(trigger => trigger.toLowerCase().replace("!", ""));
         this.message = commandData.message;
         this._success_reply = commandData.success_reply;
-        this._failure_reply = commandData.failure_reply;
+        this._insufficient_permissions_reply = commandData.insufficient_permissions_reply;
         this._insufficient_arguments_reply = commandData.insufficient_arguments_reply;
     }
     getKeysightMessage(chatUser, chatCommand) {
         return this._replaceWildcards(this.message, chatUser, chatCommand);
     }
-    hasFailureReply() {
-        return !!this._failure_reply;
+    hasInsufficientPermissionsReply() {
+        return !!this._insufficient_permissions_reply;
     }
     hasSuccessReply() {
         return !!this._success_reply;
@@ -67,14 +64,14 @@ class Command {
     getSuccessReply(chatUser, chatCommand) {
         return this._success_reply && this._replaceWildcards(this._success_reply, chatUser, chatCommand);
     }
-    getFailureReply(chatUser, chatCommand) {
-        return this._failure_reply && this._replaceWildcards(this._failure_reply, chatUser, chatCommand);
+    getInsufficientPermissionsReply(chatUser, chatCommand) {
+        return this._insufficient_permissions_reply && this._replaceWildcards(this._insufficient_permissions_reply, chatUser, chatCommand);
     }
     getInsufficientArgumentsReply(chatUser, chatCommand) {
         return this._insufficient_arguments_reply && this._replaceWildcards(this._insufficient_arguments_reply, chatUser, chatCommand);
     }
     _replaceWildcards(text, chatUser, chatCommand) {
-        return text.replaceAll("$cmd", this.commandName).replaceAll("$msg", chatCommand.msg).replaceAll("$usr", chatUser.displayName)
+        return text.replaceAll("$cmd", this.commandName).replaceAll("$msg", chatCommand.msg).replaceAll("$usr", `@${chatUser.displayName}`).replaceAll("$res", chatCommand.response);
     }
 
     checkUserPermissions(chatUser) {
@@ -96,7 +93,7 @@ class CommandManager extends EventEmitter {
         super();
         this._setCommands(loadCommands() || {});
         fs.watchFile(COMMANDS_FILE, () => {
-            console.log(`🔹 ${COMMANDS_FILE} changed. Updating commands...`)
+            DebugLog.info(`${COMMANDS_FILE} changed. Updating commands...`);
             const newCommandsData = loadCommands();
             if (newCommandsData) {
                 this._setCommands(newCommandsData);
@@ -119,9 +116,9 @@ class CommandManager extends EventEmitter {
             })
         })
         if (!valid) {
-            console.warn("⚠️ Commands updated, ignoring duplicate commands")
+            DebugLog.warn("Commands updated, ignoring duplicate commands")
         } else {
-            console.warn("✔ Commands updated")
+            DebugLog.success("Commands updated")
         }
         this.triggers = newTriggers;
         this.commands = newCommands;

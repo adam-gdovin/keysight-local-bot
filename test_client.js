@@ -17,7 +17,7 @@ socket.on('command', (data) => {
     console.log(data);
 
     // Send a response back
-    socket.emit(data.substr(0, 20), "yep");
+    // socket.emit(data.substr(0, 20), "yep");
 });
 // Handle disconnection
 socket.on('disconnect', () => {

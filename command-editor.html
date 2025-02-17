@@ -121,7 +121,7 @@
                         <span>Success Reply:</span> <input type="text" value="${data.success_reply}" onchange="updateField('${name}', 'success_reply', this.value)">
                     </div>
                     <div>
-                        <span>Failure Reply:</span> <input type="text" value="${data.failure_reply}" onchange="updateField('${name}', 'failure_reply', this.value)">
+                        <span>Insufficient Permissions Reply:</span> <input type="text" value="${data.insufficient_permissions_reply}" onchange="updateField('${name}', 'insufficient_permissions_reply', this.value)">
                     </div>
                     <div>
                         <span>Insufficient Args Reply:</span> <input type="text" value="${data.insufficient_arguments_reply}" onchange="updateField('${name}', 'insufficient_arguments_reply', this.value)">
@@ -162,7 +162,7 @@
                 permissions: { everyone: false, tier1: false, tier2: false, tier3: false, vip: false, mod: false },
                 message: '',
                 success_reply: '',
-                failure_reply: '',
+                insufficient_permissions_reply: '',
                 insufficient_arguments_reply: ''
             };
             renderCommands();

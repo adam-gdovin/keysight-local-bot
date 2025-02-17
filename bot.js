@@ -1,5 +1,6 @@
 const tmi = require("tmi.js");
 const { EventEmitter } = require("events");
+const DebugLog = require("./debug-log");
 
 /**
  * User object at the moment of their message
@@ -69,7 +70,7 @@ class ChatBot extends EventEmitter {
             channels: [channel],
         });
 
-        this.client.on("connected", () => console.log("✔ Bot connected."));
+        this.client.on("connected", () => DebugLog.success("Bot connected."));
         this.client.on("message", (channel, userstate, message) => {
             if (message.startsWith("!")) {
                 const user = new ChatUser(userstate);
@@ -103,7 +104,7 @@ class ChatBot extends EventEmitter {
      */
     sendMessage(user, message) {
         if (this.responses)
-            this.client.say(this.channel, `@${user.displayName} ${message}`);
+            this.client.say(this.channel, message);
     }
 }
 

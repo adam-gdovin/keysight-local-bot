@@ -3,6 +3,7 @@ const { select } = require("@inquirer/prompts");
 const portfinder = require("portfinder")
 const fs = require("fs");
 const minimist = require("minimist");
+const DebugLog = require("./debug-log");
 
 const ARGS = minimist(process.argv.slice(2));
 const CLIENT_ID = ARGS.clientID || process.env.CLIENT_ID;
@@ -56,7 +57,7 @@ async function getAccessTokenData(accessToken) {
             return { user: data.login, expires_in: data.expires_in, access_token: accessToken };
         }
     } catch (error) {
-        console.error('✘ Error validating token:', error);
+        DebugLog.error("Error validating token:", error);
         return null;
     }
 }
@@ -69,19 +70,23 @@ async function getAccessTokenData(accessToken) {
  * @returns {string} TokenData.access_token - Access token itself
  */
 async function getValidAccessTokenData() {
-    let accessToken = loadToken();
-
-    if (accessToken) {
-        console.log("🔹 Validating saved access token...");
-        const tokenData = await getAccessTokenData(accessToken);
-        if (!tokenData || tokenData.expires_in <= 60 * 60 * 24) {
-            console.log("✘ Token expired or is about to expire. User must log in again.");
-        } else {
-            console.log(`✔ Token is valid. Signed in as '${tokenData.user}'`)
-            return tokenData;
-        }
+    let accessToken;
+    if (ARGS.login) {
+        DebugLog.info("Login flag enabled, skipping locally saved token and forcing re-login");
     } else {
-        console.log("🔹 No saved token found. Logging in...");
+        accessToken = loadToken();
+        if (accessToken) {
+            DebugLog.info("Validating saved access token...");
+            const tokenData = await getAccessTokenData(accessToken);
+            if (!tokenData || tokenData.expires_in <= 60 * 60 * 24) {
+                DebugLog.error("Token expired or is about to expire. User must log in again.");
+            } else {
+                DebugLog.success(`Token is valid. Signed in as '${tokenData.user}'`)
+                return tokenData;
+            }
+        } else {
+            DebugLog.info("No saved token found. Logging in...");
+        }
     }
 
     accessToken = await authenticateUser();
@@ -89,7 +94,7 @@ async function getValidAccessTokenData() {
 
     const tokenData = await getAccessTokenData(accessToken);
     if (!tokenData || tokenData.expires_in <= 60 * 60 * 24) {
-        console.error("✘ There was an issue with the login process.");
+        DebugLog.error("There was an issue with the login process.");
     }
     return tokenData;
 }
@@ -107,7 +112,7 @@ function authenticateUser() {
         await new Promise(res => {
             server.once("listening", res);
         });
-        console.log("🔹 Auth server listening on port", port);
+        DebugLog.info("Auth server listening on port", port);
 
         // Endpoint to handle the OAuth redirect
         app.get('/auth', (req, res) => {
@@ -137,7 +142,7 @@ function authenticateUser() {
             }
             res.status(200).send("Success");
             server.close();
-            console.log("🔹 Auth server closing down");
+            DebugLog.info("Auth server closing down");
         });
 
         const redirectUri = `http://localhost:${port}/auth`;
@@ -158,9 +163,9 @@ function authenticateUser() {
         });
         if (browser === "manual") {
             //Let the user manually copy the redirect URL in case they are using non-standard browser
-            console.log("____________________________________________________________");
+            DebugLog.line(oauthUrl.length);
             console.log(oauthUrl);
-            console.log("____________________________________________________________");
+            DebugLog.line(oauthUrl.length);
         } else {
             //Finally open an external browser window to show the auth page
             const open = ((await import("open")).default);

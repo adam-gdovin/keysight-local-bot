@@ -5,6 +5,7 @@ const { getValidAccessTokenData } = require("./auth");
 const { ChatBot } = require("./bot");
 const { WebSocket } = require("./ws");
 const { CommandManager } = require("./commandmanager");
+const DebugLog = require("./debug-log");
 
 const minimist = require("minimist");
 const ARGS = minimist(process.argv.slice(2));
@@ -20,6 +21,7 @@ if (ARGS.help) {
       --channel         Twitch channel to join (Defaults to signed in user)
       --commandsFile    Path to commands.json file (Default './commands.json')
       --tokenFile       Path to token.json file (Default './token.json')
+      --login           Ignores the token.json file and forces relogin
     `);
     process.exit(0);  // Stop the program after showing help
 }
@@ -32,7 +34,7 @@ if (ARGS.help) {
     await bot.connect();
     bot.on("command", async (chatUser, chatCommand, callback) => {
         if (!ws.keysightClient) {
-            console.log("Socket.IO client not connected, ignoring chat command");
+            DebugLog.warn("Socket.IO client not connected, ignoring chat command");
             return;
         }
 
@@ -42,7 +44,7 @@ if (ARGS.help) {
 
         //check permissions        
         if (!command.checkUserPermissions(chatUser)) {
-            command.hasFailureReply() && callback(command.getFailureReply(chatUser, chatCommand));
+            command.hasInsufficientPermissionsReply() && callback(command.getInsufficientPermissionsReply(chatUser, chatCommand));
             return;
         }
 
@@ -51,12 +53,14 @@ if (ARGS.help) {
             command.hasInsufficientArgumentsReply() && callback(command.getInsufficientArgumentsReply(chatUser, chatCommand));
             return;
         }
-        ws.sendMessageToKeysight(command.getKeysightMessage(chatUser, chatCommand))
-            .then(() => {
+        ws.sendMessageToKeysight(command, chatUser, chatCommand)
+            .then((response) => {
+                chatCommand.response = response;
                 command.hasSuccessReply() && callback(command.getSuccessReply(chatUser, chatCommand));
             })
             .catch((error) => {
-                command.hasFailureReply() && callback(command.getFailureReply(chatUser, chatCommand));
+                if(command.hasInsufficientPermissionsReply() || command.hasSuccessReply() || command.hasInsufficientArgumentsReply())
+                    DebugLog.warn("Keysight response timed out");
             })
     })
 })();
