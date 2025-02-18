@@ -36,7 +36,7 @@ class WebSocket extends EventEmitter {
      * @param {string} message - text to send to Keysight
      * @returns {Promise<void>} - Promise resolves if Keysight successfully replies, rejects if message times out after 5 seconds
      */
-    sendMessageToKeysight(command, chatCommand, chatUser) {
+    sendMessageToKeysight(command, chatUser, chatCommand) {
         return new Promise((resolve, reject) => {
             let resolved = false;
             if (!this.keysightClient) {
@@ -45,7 +45,12 @@ class WebSocket extends EventEmitter {
             const message = command.getKeysightMessage(chatUser, chatCommand);
             const getResponse = (response) => {
                 resolved = true;
-                resolve(response);
+                try{
+                    const json = JSON.parse(response);
+                    return resolve(json.reply);
+                }catch{
+                    return resolve(response);
+                }
             }            
             this.keysightClient.once(message.substr(0, 20), getResponse);
             this.keysightClient.emit("command", message);

@@ -42,7 +42,7 @@ class ChatCommand {
     constructor(message) {
         const [trigger, ...args] = message.split(" ");
         this.trigger = trigger.replace("!", "");
-        this.msg = message.substr(trigger.length).trim();
+        this.msg = message.slice(trigger.length).trim();
     }
 }
 

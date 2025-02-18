@@ -55,7 +55,7 @@ if (ARGS.help) {
         }
         ws.sendMessageToKeysight(command, chatUser, chatCommand)
             .then((response) => {
-                chatCommand.response = (typeof response === 'object' && "reply" in response) ? response.reply : response;
+                chatCommand.response = response;
                 command.hasSuccessReply() && callback(command.getSuccessReply(chatUser, chatCommand));
             })
             .catch((error) => {
