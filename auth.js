@@ -4,9 +4,10 @@ const portfinder = require("portfinder")
 const fs = require("fs");
 const minimist = require("minimist");
 const DebugLog = require("./debug-log");
+const {default: open, apps} = require("./open.bundle.cjs");
 
 const ARGS = minimist(process.argv.slice(2));
-const CLIENT_ID = ARGS.clientID || process.env.CLIENT_ID;
+const CLIENT_ID = ARGS.clientID || process.env.CLIENT_ID || "yc48llnuk1ro0d9yno0hrl7q8j06cm";
 const TOKEN_FILE = ARGS.tokenFile || process.env.TOKEN_FILE || "token.json";
 
 /**
@@ -169,8 +170,7 @@ function authenticateUser() {
             console.log(`${DebugLog.RED}${"¯".repeat(process.stdout.columns)}${DebugLog.WHITE}`);
         } else {
             //Finally open an external browser window to show the auth page
-            const open = ((await import("open")).default);
-            const apps = ((await import("open")).apps);
+            // const {default: open, apps} = (await import("open"));
             const authWindow = await open(oauthUrl, {
                 app: {
                     name: apps[browser]
