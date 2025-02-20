@@ -14,7 +14,11 @@ class WebSocket extends EventEmitter {
         this.socket.on("connection", (clientSocket) => {
             if (this.keysightClient) {
                 DebugLog.error("Rejecting new Socket.IO client:", clientSocket.id);
-                clientSocket.emit("error", "Only one client allowed at a time.");
+                try{
+                    clientSocket.emit("error", "Only one client allowed at a time.");
+                }catch{
+
+                }
                 clientSocket.disconnect(true); // Force disconnect the new client
                 return;
             }
