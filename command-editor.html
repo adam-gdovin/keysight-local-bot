@@ -115,6 +115,7 @@
             reader.onload = function(e) {
                 try {
                     commands = JSON.parse(e.target.result);
+                    console.log(commands)
                     renderCommands();
                 } catch (error) {
                     alert('Invalid JSON file');
@@ -134,7 +135,7 @@
         function createCommandForm(name, data) {
             const container = document.getElementById('commandsContainer');
             const div = document.createElement('div');
-            div.className = 'command';3
+            div.className = 'command';
             div.innerHTML = `
                 <div id="text-labels" class="labels">
                     <div>
@@ -157,12 +158,12 @@
                     </div>
                 </div>
                 <div id="text-fields" class ="fields">
-                        <input type="text" value="${name}" onchange="updateCommandName('${name}', this.value)">
-                        <input type="text" value="${data.triggers.join(', ')}" onchange="updateTriggers('${name}', this.value)">
-                        <input type="text" value="${data.message}" onchange="updateField('${name}', 'message', this.value)">
-                        <input type="text" value="${data.success_reply}" onchange="updateField('${name}', 'success_reply', this.value)">
-                        <input type="text" value="${data.insufficient_permissions_reply}" onchange="updateField('${name}', 'insufficient_permissions_reply', this.value)">
-                        <input type="text" value="${data.insufficient_arguments_reply}" onchange="updateField('${name}', 'insufficient_arguments_reply', this.value)">
+                        <input type="text" value="${name.replace(/"/g, "&quot;")}" onchange="updateCommandName('${name}', this.value)">
+                        <input type="text" value="${data.triggers.join(', ').replace(/"/g, "&quot;")}" onchange="updateTriggers('${name}', this.value)">
+                        <input type="text" value="${data.message.replace(/"/g, "&quot;")}" onchange="updateField('${name}', 'message', this.value)">
+                        <input type="text" value="${data.success_reply.replace(/"/g, "&quot;")}" onchange="updateField('${name}', 'success_reply', this.value)">
+                        <input type="text" value="${data.insufficient_permissions_reply.replace(/"/g, "&quot;")}" onchange="updateField('${name}', 'insufficient_permissions_reply', this.value)">
+                        <input type="text" value="${data.insufficient_arguments_reply.replace(/"/g, "&quot;")}" onchange="updateField('${name}', 'insufficient_arguments_reply', this.value)">
                 </div>
                 <div id="permission-labels" class="labels">
                     ${Object.keys(data.permissions).map(role => `<div><span>${role.toUpperCase()}:</span></div>`).join(' ')}
