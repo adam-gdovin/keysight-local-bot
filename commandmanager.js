@@ -111,11 +111,11 @@ class CommandManager extends EventEmitter {
         let valid = true;
         newCommands.forEach(command => {
             command.triggers.forEach(trigger => {
-                if (newTriggers.hasOwnProperty(trigger)) {
-                    console.error(`⚠️ Duplicate trigger word "${trigger}" in multiple commands: "${command.commandName}" and "${newTriggers[trigger].commandName}"`);
+                if (newTriggers.hasOwnProperty(trigger.toLowerCase())) {
+                    console.error(`⚠️ Duplicate trigger word "${trigger.toLowerCase()}" in multiple commands: "${command.commandName}" and "${newTriggers[trigger].commandName}"`);
                     valid = false;
                 } else {
-                    newTriggers[trigger] = command;
+                    newTriggers[trigger.toLowerCase()] = command;
                 }
             })
         })
@@ -134,7 +134,7 @@ class CommandManager extends EventEmitter {
      * @return {Command} object containing command data such as permissions and reply messages
      */
     getCommandFromTrigger(trigger) {
-        return this.triggers[trigger] || null;
+        return this.triggers[trigger.toLowerCase()] || null;
     }
 }
 
